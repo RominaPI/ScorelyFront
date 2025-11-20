@@ -5,26 +5,24 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.scorly.Navigation.HomeScreenRoute
-import com.example.scorly.Navigation.JugadoresRoute
-import com.example.scorly.Navigation.LoginRoute
-import com.example.scorly.Navigation.PrincipalRoute
-import com.example.scorly.Navigation.SignUpRoute
-import com.example.scorly.Screens.Login
-import com.example.scorly.Screens.PaginaPrincipal
-import com.example.scorly.Screens.PantallaJugadores
-import com.example.scorly.Screens.SignUp
-import com.example.scorly.ui.theme.ScorlyTheme
-import androidx.navigation.toRoute
+import com.example.Scorly.Navigation.HomeScreenRoute
+import com.example.Scorly.Navigation.JugadoresRoute
+import com.example.Scorly.Navigation.LoginRoute
+import com.example.Scorly.Navigation.PrincipalRoute
+import com.example.Scorly.Navigation.SignUpRoute
+import com.example.Scorly.Screens.Login
+import com.example.Scorly.Screens.PaginaPrincipal
+import com.example.Scorly.Screens.PantallaJugadores
+import com.example.Scorly.Screens.SignUp
+import com.example.Scorly.Screens.HomeScreen
+import com.example.Scorly.ui.theme.ScorlyTheme
 
 
 class MainActivity : ComponentActivity() {

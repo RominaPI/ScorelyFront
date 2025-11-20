@@ -1,4 +1,4 @@
-package com.example.scorly.ui.theme
+package com.example.Scorly.ui.theme
 
 import android.app.Activity
 import android.os.Build

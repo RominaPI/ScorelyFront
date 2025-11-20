@@ -1,12 +1,15 @@
-package com.example.scorly.Screens
+package com.example.Scorly.Screens
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -29,21 +32,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.Scorly.Navigation.JugadoresRoute
 import com.example.scorly.R
-import com.example.scorly.ui.theme.ScorlyTheme
-import com.example.scorly.ui.theme.blanco
-import com.example.scorly.ui.theme.contraseña
+import com.example.Scorly.ui.theme.ScorlyTheme
+import com.example.Scorly.ui.theme.amarillo
+import com.example.Scorly.ui.theme.blanco
+import com.example.Scorly.ui.theme.contraseña
 import kotlinx.coroutines.launch
 
 @Composable
 fun PaginaPrincipal(navController: NavController) {
+
     Box(modifier = Modifier.fillMaxSize()) {
+
         // Fondo
         Image(
             painter = painterResource(id = R.drawable.fondoprincipal),
             contentDescription = "Fondo",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
+        )
+
+        // Oscurecer fondo
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
         )
 
         // Icono de regreso
@@ -56,58 +70,80 @@ fun PaginaPrincipal(navController: NavController) {
                 .size(28.dp)
         )
 
-        // Contenido principal
-        Column(
+        // Contenido con scroll
+        LazyColumn(
             modifier = Modifier
                 .padding(top = 22.dp)
                 .fillMaxSize()
-                .padding(18.dp),
+                .padding(horizontal = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(25.dp)
+            verticalArrangement = Arrangement.spacedBy(25.dp),
+            contentPadding = PaddingValues(bottom = 40.dp)
         ) {
-            Text(
-                text = "SCORLY",
-                fontWeight = FontWeight.Bold,
-                fontSize = 90.sp,
-                color = blanco.copy(alpha = 0.8f),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
 
+            item {
+                Text(
+                    text = "SCORELY",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 70.sp,
+                    color = blanco.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
 
-            AnimatedButton("Jugadores") {
-                navController.navigate("jugadores")
+            item {
+                AnimatedButton("Jugadores", R.drawable.jugadores, imagen = R.drawable.jugadoresbanner) {
+                    navController.navigate(JugadoresRoute)
+                }
             }
-            AnimatedButton("Equipos") {
-                navController.navigate("equipos")
+
+            item {
+                AnimatedButton("Equipos", R.drawable.equipos, imagen = R.drawable.equiposbanner) {
+                    navController.navigate("equipos")
+                }
             }
-            AnimatedButton("Estadísticas") {
-                navController.navigate("estadisticas")
+
+            item {
+                AnimatedButton("Estadísticas", R.drawable.estadisticas, imagen = R.drawable.estadisticasbanner) {
+                    navController.navigate("estadisticas")
+                }
             }
-            AnimatedButton("Rankings") {
-                navController.navigate("rankings")
+
+            item {
+                AnimatedButton("Rankings", R.drawable.rankings, imagen = R.drawable.loginfondo) {
+                    navController.navigate("rankings")
+                }
             }
-            AnimatedButton("Historial") {
-                navController.navigate("rankings")
+
+            item {
+                AnimatedButton("Historial", R.drawable.historial, imagen = R.drawable.loginfondo) {
+                    navController.navigate("rankings")
+                }
             }
         }
     }
 }
 
 @Composable
-fun AnimatedButton(text: String, onClick: () -> Unit) {
+fun AnimatedButton(
+    text: String,
+    icon: Int,
+    imagen: Int,
+    onClick: () -> Unit
+) {
     var isPressed by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val rippleRadius = remember { Animatable(0f) }
     val rippleAlpha = remember { Animatable(0f) }
 
     Box(
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.BottomStart,
         modifier = Modifier
-            .width(300.dp) // 🔹 MISMO ancho para todos
-            .height(90.dp) // 🔹 MISMA altura para todos
+            .width(300.dp)
+            .height(270.dp)
             .clip(RoundedCornerShape(28.dp))
-            .border(1.dp, Color.Black.copy(alpha = 0.8f), RoundedCornerShape(28.dp))
+            .border(1.dp, amarillo.copy(alpha = 0.8f), RoundedCornerShape(28.dp))
             .pointerInput(Unit) {
                 detectTapGestures(
                     onPress = {
@@ -115,17 +151,17 @@ fun AnimatedButton(text: String, onClick: () -> Unit) {
                         rippleRadius.snapTo(0f)
                         rippleAlpha.snapTo(0.4f)
 
-                        // Animaciones ripple
+                        // Animación del ripple
                         scope.launch {
                             rippleRadius.animateTo(
                                 targetValue = 600f,
-                                animationSpec = tween(durationMillis = 400)
+                                animationSpec = tween(400)
                             )
                         }
                         scope.launch {
                             rippleAlpha.animateTo(
                                 targetValue = 0f,
-                                animationSpec = tween(durationMillis = 400)
+                                animationSpec = tween(400)
                             )
                         }
 
@@ -136,7 +172,17 @@ fun AnimatedButton(text: String, onClick: () -> Unit) {
                 )
             }
     ) {
-        // Efecto visual del toque
+
+        Image(
+            painter = painterResource(id = imagen),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 70.dp),
+            contentScale = ContentScale.Crop
+        )
+
+        // Ripple
         Canvas(modifier = Modifier.matchParentSize()) {
             drawIntoCanvas {
                 drawCircle(
@@ -147,14 +193,28 @@ fun AnimatedButton(text: String, onClick: () -> Unit) {
             }
         }
 
-        // Texto centrado
-        Text(
-            text = text,
-            fontWeight = FontWeight.W500,
-            fontSize = 40.sp,
-            color = if (isPressed) contraseña else Color.Black, // 🔹 color cambia al presionar
-            textAlign = TextAlign.Center
-        )
+        // Icono + texto
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(start = 20.dp)
+        ) {
+
+            Image(
+                painter = painterResource(id = icon),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(65.dp)
+                    .padding(end = 12.dp, start = 8.dp)
+            )
+
+            Text(
+                text = text,
+                fontWeight = FontWeight.W600,
+                fontSize = 28.sp,
+                color = if (isPressed) contraseña else amarillo,
+                textAlign = TextAlign.Left
+            )
+        }
     }
 }
 

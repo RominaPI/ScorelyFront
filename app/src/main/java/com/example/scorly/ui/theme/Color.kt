@@ -1,4 +1,4 @@
-package com.example.scorly.ui.theme
+package com.example.Scorly.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
@@ -13,3 +13,4 @@ val Pink40 = Color(0xFF7D5260)
 val contraseña = Color(0xFF003800)
 val negro = Color(0xFF000000)
 val blanco = Color(0xFFD1D7C0)
+val amarillo = Color(0xFFF3EF0A)

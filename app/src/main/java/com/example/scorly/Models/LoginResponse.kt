@@ -1,9 +1,16 @@
-package com.example.scorly.Models
+package com.example.Scorly.Models
 
 
 
 data class LoginResponse(
-    val success: Boolean,
-    val message: String,
-    val token: String? = null
+    val usuario: Usuario,
+    val mensaje: String,
+    val token: String
+)
+
+
+data class Usuario(
+    val usuario_id: Int,
+    val nombre_usuario: String,
+    val email: String
 )

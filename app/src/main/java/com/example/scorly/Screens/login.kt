@@ -1,5 +1,7 @@
-package com.example.scorly.Screens
+package com.example.Scorly.Screens
 
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,10 +10,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -23,21 +28,47 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.scorly.Navigation.PrincipalRoute
-import com.example.scorly.Navigation.SignUpRoute
+import com.example.Scorly.Navigation.PrincipalRoute
+import com.example.Scorly.Navigation.SignUpRoute
 import com.example.scorly.R
-import com.example.scorly.ui.theme.ScorlyTheme
-import com.example.scorly.ui.theme.contraseña
-import com.example.scorly.ui.theme.negro
+import com.example.Scorly.ui.theme.ScorlyTheme
+import com.example.Scorly.ui.theme.contraseña
+import com.example.Scorly.Data.RetrofitClient
+import com.example.Scorly.Models.LoginRequest
+import kotlinx.coroutines.launch
 
 @Composable
 fun Login(navController: NavController) {
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    val scope = rememberCoroutineScope()
+
+    // ANIMACIÓN del logo cuando está cargando
+    val infiniteTransition = rememberInfiniteTransition()
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        )
+    )
+    val colorChange by infiniteTransition.animateColor(
+        initialValue = Color.White,
+        targetValue = Color(0xFFFFD700), // Dorado
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1500, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+
+        // Fondo
         Image(
             painter = painterResource(id = R.drawable.loginfondo),
             contentDescription = null,
@@ -55,13 +86,15 @@ fun Login(navController: NavController) {
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(
+            // Flecha regresar
+            Image(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Regresar",
-                tint = Color.White,
                 modifier = Modifier
                     .padding(15.dp)
                     .size(28.dp)
+                    .clickable { navController.popBackStack() },
+                alignment = Alignment.Center,
             )
 
             Spacer(Modifier.weight(6f))
@@ -76,12 +109,12 @@ fun Login(navController: NavController) {
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = contraseña.copy(alpha = 0.7f),
                     unfocusedContainerColor = contraseña.copy(alpha = 0.7f),
-
-                    ),
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
                 modifier = Modifier
                     .height(50.dp)
                     .width(250.dp)
-                    .background(contraseña.copy(alpha = 0.7f), RoundedCornerShape(28.dp))
                     .border(1.dp, Color.White, RoundedCornerShape(28.dp))
                     .align(Alignment.CenterHorizontally)
             )
@@ -97,7 +130,8 @@ fun Login(navController: NavController) {
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = contraseña.copy(alpha = 0.7f),
                     unfocusedContainerColor = contraseña.copy(alpha = 0.7f),
-
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 ),
                 modifier = Modifier
                     .padding(top = 20.dp)
@@ -114,28 +148,93 @@ fun Login(navController: NavController) {
                 color = Color.White,
                 modifier = Modifier
                     .padding(start = 100.dp, top = 20.dp)
-                    .clickable { /* Aquí podrías navegar a otra pantalla */ }
+                    .clickable { /* Navegar a otra pantalla */ }
             )
 
-            Text(
-                text = "ENTRAR",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 28.sp,
-                color = Color.White,
+            // BOTÓN / ANIMACIÓN DE CARGA
+            Box(
                 modifier = Modifier
                     .padding(start = 148.dp, top = 104.dp)
-                    .clickable {
-                        navController.navigate(PrincipalRoute)
+                    .clickable(enabled = !isLoading) {
+                        if (email.isNotBlank() && password.isNotBlank()) {
+                            scope.launch {
+                                isLoading = true
+                                errorMessage = null
+                                try {
+                                    val response = RetrofitClient.instance.login(
+                                        LoginRequest(email, password)
+                                    )
+                                    if (response.isSuccessful) {
+                                        val body = response.body()
+                                        if (body != null && body.mensaje == "Login exitoso") {
+                                            // ✅ Puedes guardar token si deseas:
+                                            // val token = body.token
+                                            // val nombre = body.usuario.nombre_usuario
+                                            navController.navigate(PrincipalRoute)
+                                        } else {
+                                            errorMessage = body?.mensaje ?: "Credenciales incorrectas"
+                                        }
+                                    } else {
+                                        errorMessage = "Error: ${response.code()}"
+                                    }
+                                } catch (e: Exception) {
+                                    errorMessage = "Error de conexión: ${e.localizedMessage}"
+                                } finally {
+                                    isLoading = false
+                                }
+                            }
+                        } else {
+                            errorMessage = "Por favor completa los campos"
+                        }
                     }
-            )
+            ) {
+                if (isLoading) {
+                    Image(
+                        painter = painterResource(id = R.drawable.scorelylogo2),
+                        contentDescription = "Cargando",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .padding(start = 158.dp)
+                            .rotate(rotation)
+                            .align(Alignment.Center),
+                    )
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+
+                    )
+                } else {
+                    Text(
+                        text = "ENTRAR",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 28.sp,
+                        color = Color.White,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+
+            // MENSAJE DE ERROR
+            errorMessage?.let {
+                Text(
+                    text = it,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = 16.dp)
+                )
+            }
 
             Spacer(Modifier.weight(1f))
 
+            // Sign up
             Text(
                 text = "SIGN UP",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp,
-                color = Color.White.copy(alpha=0.8f),
+                color = Color.White.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(start = 158.dp, bottom = 60.dp)
@@ -146,6 +245,7 @@ fun Login(navController: NavController) {
 
             Spacer(Modifier.weight(1f))
 
+            // Marca
             Text(
                 text = "SCORELY",
                 fontWeight = FontWeight.Bold,

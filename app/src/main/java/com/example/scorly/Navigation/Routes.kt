@@ -1,4 +1,4 @@
-package com.example.scorly.Navigation
+package com.example.Scorly.Navigation
 
 import kotlinx.serialization.Serializable
 
