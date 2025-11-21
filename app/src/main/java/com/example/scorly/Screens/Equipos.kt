@@ -29,16 +29,20 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.scorly.R
 import com.example.Scorly.Models.Equipo
 import com.example.Scorly.ViewModel.EquiposViewModel
+import com.example.Scorly.ViewModel.EquiposViewModelFactory
+import com.example.Scorly.Data.ApiServiceFactory
 
-
-// ---------------------------------------------------------
-// PANTALLA EQUIPOS
-// ---------------------------------------------------------
 @Composable
 fun PantallaEquipos(
-    viewModel: EquiposViewModel = viewModel(),
     onEquipoClick: (Equipo) -> Unit
 ) {
+    // Crear API desde Factory
+    val api = ApiServiceFactory.create()
+
+    // Crear ViewModel con Factory
+    val viewModel: EquiposViewModel = viewModel(
+        factory = EquiposViewModelFactory(api)
+    )
 
     val equipos by viewModel.equipos.collectAsState()
 
@@ -58,14 +62,10 @@ fun PantallaEquipos(
             contentScale = ContentScale.Crop
         )
 
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-
+        Column(modifier = Modifier.fillMaxWidth()) {
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
@@ -78,7 +78,6 @@ fun PantallaEquipos(
                 )
             }
 
-
             Text(
                 text = "Equipos",
                 fontWeight = FontWeight.Bold,
@@ -90,13 +89,12 @@ fun PantallaEquipos(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // *** LAZY ROW CON ESPACIO ABAJO ***
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 40.dp) // ← ESPACIO FINAL
+                contentPadding = PaddingValues(bottom = 40.dp)
             ) {
                 items(equipos) { equipo ->
                     EquipoMegaBoton(equipo = equipo) {
@@ -108,10 +106,6 @@ fun PantallaEquipos(
     }
 }
 
-
-// ---------------------------------------------------------
-// MEGA BOTÓN DEL EQUIPO
-// ---------------------------------------------------------
 @Composable
 fun EquipoMegaBoton(
     equipo: Equipo,
@@ -139,12 +133,10 @@ fun EquipoMegaBoton(
             modifier = Modifier.fillMaxHeight()
         ) {
             Text(
-                text =  equipo.escudo_logo_url,
+                text = equipo.escudo_logo_url,
                 fontSize = 16.sp,
                 color = Color.DarkGray
             )
-
-
 
             Text(
                 text = equipo.nombre,
@@ -152,7 +144,6 @@ fun EquipoMegaBoton(
                 fontSize = 28.sp,
                 color = Color.Black
             )
-
 
             Text(
                 text = "Ciudad: ${equipo.ciudad}",
@@ -174,19 +165,4 @@ fun EquipoMegaBoton(
             )
         }
     }
-}
-
-
-// ---------------------------------------------------------
-// PREVIEW
-// ---------------------------------------------------------
-@Composable
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
-fun EquiposPreview() {
-
-
-    PantallaEquipos(
-
-        onEquipoClick = {}
-    )
 }
