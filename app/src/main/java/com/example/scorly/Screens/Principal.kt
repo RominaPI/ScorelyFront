@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.Scorly.Navigation.EquiposRoute
 import com.example.Scorly.Navigation.JugadoresRoute
 import com.example.scorly.R
 import com.example.Scorly.ui.theme.ScorlyTheme
@@ -100,7 +101,7 @@ fun PaginaPrincipal(navController: NavController) {
 
             item {
                 AnimatedButton("Equipos", R.drawable.equipos, imagen = R.drawable.equiposbanner) {
-                    navController.navigate("equipos")
+                    navController.navigate(EquiposRoute)
                 }
             }
 
@@ -111,13 +112,13 @@ fun PaginaPrincipal(navController: NavController) {
             }
 
             item {
-                AnimatedButton("Rankings", R.drawable.rankings, imagen = R.drawable.loginfondo) {
+                AnimatedButton("Rankings", R.drawable.rankings, imagen = R.drawable.rankingsbanner) {
                     navController.navigate("rankings")
                 }
             }
 
             item {
-                AnimatedButton("Historial", R.drawable.historial, imagen = R.drawable.loginfondo) {
+                AnimatedButton("Historial", R.drawable.historial, imagen = R.drawable.historialbanner) {
                     navController.navigate("rankings")
                 }
             }

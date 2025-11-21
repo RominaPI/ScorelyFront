@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.Scorly.Models.Equipo
+import com.example.Scorly.Navigation.EquiposRoute
 import com.example.Scorly.Navigation.HomeScreenRoute
 import com.example.Scorly.Navigation.JugadoresRoute
 import com.example.Scorly.Navigation.LoginRoute
@@ -22,6 +24,7 @@ import com.example.Scorly.Screens.PaginaPrincipal
 import com.example.Scorly.Screens.PantallaJugadores
 import com.example.Scorly.Screens.SignUp
 import com.example.Scorly.Screens.HomeScreen
+import com.example.Scorly.Screens.PantallaEquipos
 import com.example.Scorly.ui.theme.ScorlyTheme
 
 
@@ -52,12 +55,23 @@ class MainActivity : ComponentActivity() {
                         composable<SignUpRoute>{
                             SignUp(nav)
                         }
+                        composable<EquiposRoute> {
+                            PantallaEquipos(
+                                onEquipoClick = { equipo ->
+                                    nav.navigate(JugadoresRoute)
+                                }
+                            )
+                        }
+
+                        }
+
+
                     }
                 }
             }
         }
     }
-}
+
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {

@@ -1,5 +1,6 @@
 package com.example.Scorly.Data
 
+import com.example.Scorly.Models.Equipo
 import com.example.Scorly.Models.Jugador
 
 import com.example.Scorly.Models.LoginRequest
@@ -54,4 +55,7 @@ interface ApiService {
     suspend fun deleteJugador(
         @Path("id") id: Int
     ): Response<Unit>
+
+    @GET("equipos")
+    suspend fun getEquipos(): Response<List<Equipo>>
 }

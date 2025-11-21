@@ -88,7 +88,8 @@ fun PantallaJugadores(
                             Text(
                                 text = pos,
                                 color = if (filtroActual == pos) Color.Black else Color.White,
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 12.sp
                             )
                         },
                         colors = FilterChipDefaults.filterChipColors(

@@ -12,6 +12,9 @@ object LoginRoute
 object JugadoresRoute
 
 @Serializable
+object EquiposRoute
+
+@Serializable
 object PrincipalRoute
 
 @Serializable
