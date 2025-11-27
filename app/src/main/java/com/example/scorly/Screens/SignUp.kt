@@ -56,7 +56,7 @@ fun SignUp(navController: NavController) {
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
 
-    // Crear Retrofit local
+
     val api: ApiService = Retrofit.Builder()
         .baseUrl("http://165.227.57.191:3000/")
         .addConverterFactory(GsonConverterFactory.create())
@@ -90,7 +90,7 @@ fun SignUp(navController: NavController) {
                     .clickable { navController.popBackStack() }
             )
 
-            // Imágenes decorativas
+
             listOf(
                 R.drawable.secuencia1,
                 R.drawable.secuencia2,

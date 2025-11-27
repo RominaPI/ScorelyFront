@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
                         }
 
 
-                        // 6. LIGAS Y EQUIPOS
+                        // 6. LIGAS
                         composable<LigasRoute> {
                             PantallaSeleccionLiga(
                                 onLigaClick = { idLiga ->
@@ -72,13 +72,18 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
+                        // 7. EQUIPOS
                         composable<EquiposRoute> { backStackEntry ->
                             val args = backStackEntry.toRoute<EquiposRoute>()
                             val idDeLaLiga = args.id
 
-
                             PantallaEquipos(
-                                onEquipoClick = { equipo ->
+                                ligaId = idDeLaLiga,
+                                onBackClick = {
+                                    nav.popBackStack()
+                                },
+                                // CAMBIO AQUÍ: Ahora usamos onSiguienteClick porque tienes un botón para avanzar
+                                onSiguienteClick = {
                                     nav.navigate(JugadoresRoute)
                                 }
                             )

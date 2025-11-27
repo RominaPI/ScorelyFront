@@ -6,6 +6,9 @@ import kotlinx.serialization.Serializable
 object HomeScreenRoute
 
 @Serializable
+object PruebaRoute
+
+@Serializable
 object LoginRoute
 
 @Serializable
