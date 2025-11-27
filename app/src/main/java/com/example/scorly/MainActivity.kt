@@ -82,7 +82,6 @@ class MainActivity : ComponentActivity() {
                                 onBackClick = {
                                     nav.popBackStack()
                                 },
-                                // CAMBIO AQUÍ: Ahora usamos onSiguienteClick porque tienes un botón para avanzar
                                 onSiguienteClick = {
                                     nav.navigate(JugadoresRoute)
                                 }

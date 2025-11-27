@@ -1,4 +1,4 @@
-package com.example.scorly.ViewModels // <-- Verifica que este paquete sea correcto (lowercase)
+package com.example.scorly.ViewModels
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
