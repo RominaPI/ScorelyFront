@@ -1,8 +1,8 @@
-package com.example.Scorly.ViewModel
+package com.example.scorly.ViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.Scorly.Data.ApiService
+import com.example.scorly.Data.ApiService
 
 class EquiposViewModelFactory(
     private val api: ApiService

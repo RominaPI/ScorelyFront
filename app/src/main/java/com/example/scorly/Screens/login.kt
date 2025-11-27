@@ -1,4 +1,4 @@
-package com.example.Scorly.Screens
+package com.example.scorly.Screens
 
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.*
@@ -28,13 +28,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.Scorly.Navigation.PrincipalRoute
-import com.example.Scorly.Navigation.SignUpRoute
+import com.example.scorly.Navigation.PrincipalRoute
+import com.example.scorly.Navigation.SignUpRoute
 import com.example.scorly.R
-import com.example.Scorly.ui.theme.ScorlyTheme
-import com.example.Scorly.ui.theme.contraseña
-import com.example.Scorly.Data.RetrofitClient
-import com.example.Scorly.Models.LoginRequest
+import com.example.scorly.ui.theme.ScorlyTheme
+import com.example.scorly.ui.theme.contraseña
+import com.example.scorly.Data.RetrofitClient
+import com.example.scorly.Models.LoginRequest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -148,7 +148,7 @@ fun Login(navController: NavController) {
                 color = Color.White,
                 modifier = Modifier
                     .padding(start = 100.dp, top = 20.dp)
-                    .clickable { /* Navegar a otra pantalla */ }
+                    .clickable {  }
             )
 
             // BOTÓN / ANIMACIÓN DE CARGA
@@ -167,9 +167,7 @@ fun Login(navController: NavController) {
                                     if (response.isSuccessful) {
                                         val body = response.body()
                                         if (body != null && body.mensaje == "Login exitoso") {
-                                            // ✅ Puedes guardar token si deseas:
-                                            // val token = body.token
-                                            // val nombre = body.usuario.nombre_usuario
+
                                             navController.navigate(PrincipalRoute)
                                         } else {
                                             errorMessage = body?.mensaje ?: "Credenciales incorrectas"

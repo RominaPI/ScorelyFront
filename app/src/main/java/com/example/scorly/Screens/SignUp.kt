@@ -1,4 +1,4 @@
-package com.example.Scorly.Screens
+package com.example.scorly.Screens
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -33,15 +33,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.Scorly.Data.ApiService
-import com.example.Scorly.Models.RegistroRequest
-import com.example.Scorly.Models.RegistroResponse
-import com.example.Scorly.Navigation.PrincipalRoute
+import com.example.scorly.Data.ApiService
+import com.example.scorly.Models.RegistroRequest
+import com.example.scorly.Models.RegistroResponse
+import com.example.scorly.Navigation.PrincipalRoute
 import com.example.scorly.R
-import com.example.Scorly.ui.theme.ScorlyTheme
-import com.example.Scorly.ui.theme.blanco
-import com.example.Scorly.ui.theme.contraseña
-import com.example.Scorly.ui.theme.negro
+import com.example.scorly.ui.theme.ScorlyTheme
+import com.example.scorly.ui.theme.blanco
+import com.example.scorly.ui.theme.contraseña
+import com.example.scorly.ui.theme.negro
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

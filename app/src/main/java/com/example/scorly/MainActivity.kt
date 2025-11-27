@@ -12,21 +12,16 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.Scorly.Models.Equipo
-import com.example.Scorly.Navigation.EquiposRoute
-import com.example.Scorly.Navigation.HomeScreenRoute
-import com.example.Scorly.Navigation.JugadoresRoute
-import com.example.Scorly.Navigation.LoginRoute
-import com.example.Scorly.Navigation.PrincipalRoute
-import com.example.Scorly.Navigation.SignUpRoute
-import com.example.Scorly.Screens.Login
-import com.example.Scorly.Screens.PaginaPrincipal
-import com.example.Scorly.Screens.PantallaJugadores
-import com.example.Scorly.Screens.SignUp
-import com.example.Scorly.Screens.HomeScreen
-import com.example.Scorly.Screens.PantallaEquipos
-import com.example.Scorly.ui.theme.ScorlyTheme
-
+import androidx.navigation.toRoute
+import com.example.scorly.Navigation.*
+import com.example.scorly.Screens.Login
+import com.example.scorly.Screens.PaginaPrincipal
+import com.example.scorly.Screens.PantallaJugadores
+import com.example.scorly.Screens.SignUp
+import com.example.scorly.Screens.HomeScreen
+import com.example.scorly.Screens.PantallaEquipos
+import com.example.scorly.Screens.PantallaSeleccionLiga
+import com.example.scorly.ui.theme.ScorlyTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,26 +31,52 @@ class MainActivity : ComponentActivity() {
             ScorlyTheme {
                 val nav = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+
                     NavHost(
                         navController = nav,
                         startDestination = HomeScreenRoute
                     ) {
+
+                        // 1. HOME
                         composable<HomeScreenRoute> {
                             HomeScreen(navController = nav)
                         }
+
+                        // 2. JUGADORES
                         composable<JugadoresRoute>{
                             PantallaJugadores()
                         }
+
+                        // 3. LOGIN
                         composable<LoginRoute> {
                             Login(navController = nav)
                         }
+
+                        // 4. PRINCIPAL
                         composable<PrincipalRoute> {
                             PaginaPrincipal(nav)
                         }
+
+                        // 5. SIGNUP
                         composable<SignUpRoute>{
                             SignUp(nav)
                         }
-                        composable<EquiposRoute> {
+
+
+                        // 6. LIGAS Y EQUIPOS
+                        composable<LigasRoute> {
+                            PantallaSeleccionLiga(
+                                onLigaClick = { idLiga ->
+                                    nav.navigate(EquiposRoute(id = idLiga))
+                                }
+                            )
+                        }
+
+                        composable<EquiposRoute> { backStackEntry ->
+                            val args = backStackEntry.toRoute<EquiposRoute>()
+                            val idDeLaLiga = args.id
+
+
                             PantallaEquipos(
                                 onEquipoClick = { equipo ->
                                     nav.navigate(JugadoresRoute)
@@ -63,15 +84,12 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        }
-
-
                     }
                 }
             }
         }
     }
-
+}
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
@@ -80,4 +98,3 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
         modifier = modifier
     )
 }
-

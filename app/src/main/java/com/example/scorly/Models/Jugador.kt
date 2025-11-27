@@ -1,5 +1,5 @@
 
-package com.example.Scorly.Models
+package com.example.scorly.Models
 data class Jugador(
     val jugador_id: Int,
     val equipo_id: Int,

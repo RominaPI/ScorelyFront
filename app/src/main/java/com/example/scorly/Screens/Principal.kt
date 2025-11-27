@@ -1,4 +1,4 @@
-package com.example.Scorly.Screens
+package com.example.scorly.Screens
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
@@ -9,7 +9,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -32,13 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.Scorly.Navigation.EquiposRoute
-import com.example.Scorly.Navigation.JugadoresRoute
+import com.example.scorly.Navigation.LigasRoute // <--- Importamos la ruta de Ligas
+import com.example.scorly.Navigation.JugadoresRoute
 import com.example.scorly.R
-import com.example.Scorly.ui.theme.ScorlyTheme
-import com.example.Scorly.ui.theme.amarillo
-import com.example.Scorly.ui.theme.blanco
-import com.example.Scorly.ui.theme.contraseña
+import com.example.scorly.ui.theme.ScorlyTheme
+import com.example.scorly.ui.theme.amarillo
+import com.example.scorly.ui.theme.blanco
+import com.example.scorly.ui.theme.contraseña
 import kotlinx.coroutines.launch
 
 @Composable
@@ -101,7 +100,9 @@ fun PaginaPrincipal(navController: NavController) {
 
             item {
                 AnimatedButton("Equipos", R.drawable.equipos, imagen = R.drawable.equiposbanner) {
-                    navController.navigate(EquiposRoute)
+                    // CÓDIGO CORREGIDO: Navegamos al selector de ligas (LigasRoute)
+                    // La navegación a Equipos se hace desde la pantalla de Ligas.
+                    navController.navigate(LigasRoute)
                 }
             }
 

@@ -1,6 +1,6 @@
-package com.example.Scorly.Screens
+package com.example.scorly.Screens
 
-import com.example.Scorly.Models.Jugador
+import com.example.scorly.Models.Jugador
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,7 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.scorly.R
-import com.example.Scorly.ui.theme.ScorlyTheme
+import com.example.scorly.ui.theme.ScorlyTheme
 import java.time.LocalDate
 import java.time.Period
 

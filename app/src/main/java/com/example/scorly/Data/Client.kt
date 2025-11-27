@@ -1,4 +1,4 @@
-package com.example.Scorly.Data
+package com.example.scorly.Data
 
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL = "http://165.227.57.191:3000/" // Cambia esto
+    private const val BASE_URL = "http://165.227.57.191:3000/"
 
     private val client = OkHttpClient.Builder()
         .addInterceptor(HttpLoggingInterceptor().apply {

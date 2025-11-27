@@ -1,4 +1,4 @@
-package com.example.Scorly.Screens
+package com.example.scorly.Screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -18,9 +18,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.Scorly.Navigation.LoginRoute
+import com.example.scorly.Navigation.LoginRoute
 import com.example.scorly.R
-import com.example.Scorly.ui.theme.ScorlyTheme
+import com.example.scorly.ui.theme.ScorlyTheme
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -35,7 +35,7 @@ fun HomeScreen(navController: NavController) {
             contentScale = ContentScale.Crop
         )
 
-        // 🔹 Botón de "EMPEZAR"
+
         Text(
             text = "EMPEZAR",
             fontWeight = FontWeight.Bold,

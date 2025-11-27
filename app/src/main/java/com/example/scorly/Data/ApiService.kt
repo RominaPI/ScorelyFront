@@ -1,21 +1,25 @@
-package com.example.Scorly.Data
+package com.example.scorly.Data
 
-import com.example.Scorly.Models.Equipo
-import com.example.Scorly.Models.Jugador
-
-import com.example.Scorly.Models.LoginRequest
-import com.example.Scorly.Models.LoginResponse
-import com.example.Scorly.Models.RegistroRequest
-import com.example.Scorly.Models.RegistroResponse
+import com.example.scorly.Models.EquiposResponse
+import com.example.scorly.Models.Jugador
+import com.example.scorly.Models.JugadoresResponse
+import com.example.scorly.Models.LigasResponse
+import com.example.scorly.Models.LoginRequest
+import com.example.scorly.Models.LoginResponse
+import com.example.scorly.Models.RegistroRequest
+import com.example.scorly.Models.RegistroResponse
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.DELETE
 import retrofit2.http.Path
+
+
+const val BASE_URL = "http://165.227.57.191:3000/api/"
 
 interface ApiService {
 
@@ -28,10 +32,8 @@ interface ApiService {
 
 
     // ----------- JUGADORES -----------
-
-    // Obtener todos los jugadores
     @GET("jugadores")
-    suspend fun getJugadores(): Response<List<Jugador>>
+    suspend fun getJugadores(): Response<JugadoresResponse>
 
     // Obtener jugador por ID
     @GET("jugadores/{id}")
@@ -58,14 +60,20 @@ interface ApiService {
         @Path("id") id: Int
     ): Response<Unit>
 
+
     @GET("equipos")
-    suspend fun getEquipos(): Response<List<Equipo>>
+    suspend fun getEquipos(): Response<EquiposResponse>
+
+
+    @GET("ligas")
+    suspend fun getLigas(): Response<LigasResponse>
 }
+
 object ApiServiceFactory {
 
     fun create(): ApiService {
         return Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000/") // cámbialo si tu API es otra
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)

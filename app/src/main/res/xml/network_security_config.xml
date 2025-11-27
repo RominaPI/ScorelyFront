@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <base-config>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+
+    <domain-config>
+        <domain includeSubdomains="true">football-logos.cc</domain>
+
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </domain-config>
+
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">165.227.57.191</domain>
     </domain-config>
+
 </network-security-config>

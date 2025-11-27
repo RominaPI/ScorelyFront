@@ -1,103 +1,42 @@
-package com.example.Scorly.ViewModel
-
-import com.example.Scorly.Models.Jugador
-
+package com.example.scorly.ViewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.Scorly.Data.ApiService
+import com.example.scorly.Data.ApiService
+import com.example.scorly.Models.Jugador
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
-class JugadoresViewModel(
-    private val api: ApiService
-) : ViewModel() {
+class JugadoresViewModel(private val api: ApiService) : ViewModel() {
 
-    // Estado de lista de jugadores
     private val _jugadores = MutableStateFlow<List<Jugador>>(emptyList())
-    val jugadores: StateFlow<List<Jugador>> = _jugadores
+    val jugadores = _jugadores.asStateFlow()
 
-    // Estado de errores
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading = _isLoading.asStateFlow()
 
-    // Estado de carga
-    private val _loading = MutableStateFlow(false)
-    val loading: StateFlow<Boolean> = _loading
+    init {
+        getJugadores()
+    }
 
-
-    // ---------- Cargar jugadores ----------
-    fun cargarJugadores() {
+    fun getJugadores() {
+        _isLoading.value = true
         viewModelScope.launch {
             try {
-                _loading.value = true
+
                 val response = api.getJugadores()
 
                 if (response.isSuccessful) {
-                    _jugadores.value = response.body() ?: emptyList()
+                    _jugadores.value = response.body()?.data ?: emptyList()
                 } else {
-                    _error.value = "Error al obtener jugadores"
+                    println("Error HTTP al obtener jugadores. Código: ${response.code()}")
                 }
-
             } catch (e: Exception) {
-                _error.value = "Error de conexión: ${e.message}"
+                println("FATAL ERROR en getJugadores: ${e.message}")
             } finally {
-                _loading.value = false
-            }
-        }
-    }
-
-
-    // ---------- Crear jugador ----------
-    fun crearJugador(jugador: Jugador) {
-        viewModelScope.launch {
-            try {
-                val response = api.createJugador(jugador)
-
-                if (response.isSuccessful) {
-                    cargarJugadores()
-                } else {
-                    _error.value = "No se pudo crear"
-                }
-            } catch (e: Exception) {
-                _error.value = e.message
-            }
-        }
-    }
-
-
-    // ---------- Actualizar jugador ----------
-    fun actualizarJugador(id: Int, jugador: Jugador) {
-        viewModelScope.launch {
-            try {
-                val response = api.updateJugador(id, jugador)
-
-                if (response.isSuccessful) {
-                    cargarJugadores()
-                } else {
-                    _error.value = "No se pudo actualizar"
-                }
-            } catch (e: Exception) {
-                _error.value = e.message
-            }
-        }
-    }
-
-
-    // ---------- Eliminar jugador ----------
-    fun eliminarJugador(id: Int) {
-        viewModelScope.launch {
-            try {
-                val response = api.deleteJugador(id)
-
-                if (response.isSuccessful) {
-                    cargarJugadores()
-                } else {
-                    _error.value = "No se pudo eliminar"
-                }
-            } catch (e: Exception) {
-                _error.value = e.message
+                _isLoading.value = false
             }
         }
     }

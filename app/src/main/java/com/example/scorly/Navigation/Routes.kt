@@ -1,4 +1,4 @@
-package com.example.Scorly.Navigation
+package com.example.scorly.Navigation
 
 import kotlinx.serialization.Serializable
 
@@ -12,7 +12,10 @@ object LoginRoute
 object JugadoresRoute
 
 @Serializable
-object EquiposRoute
+object LigasRoute
+
+@Serializable
+data class EquiposRoute(val id: String)
 
 @Serializable
 object PrincipalRoute

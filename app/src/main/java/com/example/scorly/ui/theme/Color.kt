@@ -1,4 +1,4 @@
-package com.example.Scorly.ui.theme
+package com.example.scorly.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

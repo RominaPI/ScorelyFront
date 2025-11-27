@@ -1,4 +1,4 @@
-package com.example.Scorly.Models
+package com.example.scorly.Models
 
 data class LoginRequest(
     val email: String,
