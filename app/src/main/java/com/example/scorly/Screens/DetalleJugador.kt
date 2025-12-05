@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.scorly.Data.ApiServiceFactory
+import com.example.scorly.Models.Estadistica
 import com.example.scorly.R
 import com.example.scorly.ViewModel.DetallesJugadorViewModel
 import com.example.scorly.ViewModel.DetallesJugadorViewModelFactory
@@ -36,14 +37,30 @@ fun PantallaDetallesJugador(
         factory = DetallesJugadorViewModelFactory(api)
     )
 
+    var estadisticas by remember { mutableStateOf<List<Estadistica>>(emptyList()) }
+    var loadingStats by remember { mutableStateOf(true) }
+
     LaunchedEffect(jugadorId) {
         viewModel.obtenerDetallesJugador(jugadorId)
+
+        try {
+            val response = api.getEstadisticasJugador(jugadorId)
+            if (response.isSuccessful && response.body() != null) {
+                estadisticas = response.body()!!.data
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            loadingStats = false
+        }
     }
 
     val jugador by viewModel.jugador.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val nombreEquipo by viewModel.nombreEquipo.collectAsState()
+    val nombreLiga by viewModel.nombreLiga.collectAsState()
+    val isLoadingJugador by viewModel.isLoading.collectAsState()
 
-    if (isLoading || jugador == null) {
+    if (isLoadingJugador || jugador == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = Color(0xFF006b4a))
         }
@@ -108,6 +125,31 @@ fun PantallaDetallesJugador(
                             color = Color.Gray
                         )
 
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .background(Color(0xFFF5F5F5), RoundedCornerShape(20.dp))
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = nombreEquipo,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF006b4a)
+                                )
+                                Text(
+                                    text = nombreLiga,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = Color.Gray
+                                )
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Row(
@@ -121,33 +163,62 @@ fun PantallaDetallesJugador(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    Text(
-                        text = "ESTADÍSTICAS DE TEMPORADA",
-                        modifier = Modifier.padding(start = 24.dp),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF006b4a)
-                    )
+                    if (estadisticas.isNotEmpty()) {
+                        val stat = estadisticas[0]
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                            Text(
+                                text = "ESTADÍSTICAS ${stat.temporada}",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF006b4a)
+                            )
+                            Text(
+                                text = "${stat.nombre_equipo} • ${stat.nombre_liga}",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.Gray
+                            )
+                        }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        StatBoxBig(Modifier.weight(1f), "GOLES", "24", Color(0xFF2E7D32))
-                        StatBoxBig(Modifier.weight(1f), "ASISTENCIAS", "10", Color(0xFF1565C0))
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            StatBoxBig(Modifier.weight(1f), "GOLES", stat.goles.toString(), Color(0xFF2E7D32))
+                            StatBoxBig(Modifier.weight(1f), "ASISTENCIAS", stat.asistencias.toString(), Color(0xFF1565C0))
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            StatBoxBig(Modifier.weight(1f), "T. AMARILLAS", stat.tarjetas_amarillas.toString(), Color(0xFFFBC02D))
+                            StatBoxBig(Modifier.weight(1f), "MINUTOS", stat.minutos_jugados.toString(), Color(0xFF455A64))
+                        }
+
+                    } else if (loadingStats) {
+                        Box(Modifier.fillMaxWidth().height(100.dp), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(modifier = Modifier.size(30.dp), color = Color.Gray)
+                        }
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(24.dp)
+                                .background(Color.LightGray.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Este jugador no tiene estadísticas registradas.", color = Color.Gray)
+                        }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
 
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        StatBoxBig(Modifier.weight(1f), "T. AMARILLAS", "3", Color(0xFFFBC02D))
-                        StatBoxBig(Modifier.weight(1f), "T. ROJAS", "0", Color(0xFFC62828))
-                    }
+                    Spacer(modifier = Modifier.height(50.dp))
                 }
             }
         }

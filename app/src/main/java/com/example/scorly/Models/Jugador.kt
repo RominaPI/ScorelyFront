@@ -15,4 +15,5 @@ data class Jugador(
     val nombre_equipo: String? = null,
     val escudo_equipo: String? = null,
     val data: Jugador? = null
+
 )

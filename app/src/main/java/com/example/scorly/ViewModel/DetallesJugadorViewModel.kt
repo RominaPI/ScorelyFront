@@ -14,6 +14,12 @@ class DetallesJugadorViewModel(private val api: ApiService) : ViewModel() {
     private val _jugador = MutableStateFlow<Jugador?>(null)
     val jugador = _jugador.asStateFlow()
 
+    private val _nombreEquipo = MutableStateFlow<String>("Cargando equipo...")
+    val nombreEquipo = _nombreEquipo.asStateFlow()
+
+    private val _nombreLiga = MutableStateFlow<String>("Cargando liga...")
+    val nombreLiga = _nombreLiga.asStateFlow()
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
@@ -27,7 +33,15 @@ class DetallesJugadorViewModel(private val api: ApiService) : ViewModel() {
                     val respuestaCruda = response.body()
                     val jugadorReal = respuestaCruda?.data ?: respuestaCruda
                     _jugador.value = jugadorReal
-                    println("DEBUG: Nombre recuperado: ${jugadorReal?.nombre}")
+
+                    if (!jugadorReal?.nombre_equipo.isNullOrEmpty()) {
+                        _nombreEquipo.value = jugadorReal?.nombre_equipo ?: ""
+                    }
+
+                    jugadorReal?.equipo_id?.let { idEquipo ->
+                        cargarDatosComplementarios(idEquipo)
+                    }
+
                 } else {
                     println("Error API: ${response.code()}")
                 }
@@ -36,6 +50,40 @@ class DetallesJugadorViewModel(private val api: ApiService) : ViewModel() {
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    private fun cargarDatosComplementarios(equipoId: Int) {
+        viewModelScope.launch {
+            try {
+                val responseEquipos = api.getEquipos()
+                if (responseEquipos.isSuccessful) {
+                    val listaEquipos = responseEquipos.body()?.data ?: emptyList()
+                    val miEquipo = listaEquipos.find { it.equipo_id == equipoId }
+
+                    if (miEquipo != null) {
+                        _nombreEquipo.value = miEquipo.nombre ?: "Equipo desconocido"
+                        val ligaId = miEquipo.liga_id
+                        cargarNombreLiga(ligaId)
+                    }
+                }
+            } catch (e: Exception) {
+                println("Error cargando equipos: ${e.message}")
+            }
+        }
+    }
+
+    private suspend fun cargarNombreLiga(ligaId: Int?) {
+        if (ligaId == null) return
+        try {
+            val responseLigas = api.getLigas()
+            if (responseLigas.isSuccessful) {
+                val listaLigas = responseLigas.body()?.data ?: emptyList()
+                val miLiga = listaLigas.find { it.id == ligaId }
+                _nombreLiga.value = miLiga?.nombre ?: "Liga desconocida"
+            }
+        } catch (e: Exception) {
+            println("Error cargando ligas: ${e.message}")
         }
     }
 }

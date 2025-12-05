@@ -32,9 +32,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.scorly.R
 import com.example.scorly.ViewModels.LigasViewModel
-// <--- OJO: Revisa que coincida con tu paquete
 
-// Esta clase se queda igual, es tu modelo visual
 data class LigaUI(
     val id: String,
     val nombre: String,
