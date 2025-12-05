@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.example.scorly.Data.ApiServiceFactory
 import com.example.scorly.Navigation.*
 import com.example.scorly.Screens.Login
 import com.example.scorly.Screens.PaginaPrincipal
@@ -22,6 +24,7 @@ import com.example.scorly.Screens.HomeScreen
 import com.example.scorly.Screens.PantallaEquipos
 import com.example.scorly.Screens.PantallaSeleccionLiga
 import com.example.scorly.ui.theme.ScorlyTheme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +47,16 @@ class MainActivity : ComponentActivity() {
 
                         // 2. JUGADORES
                         composable<JugadoresRoute>{
-                            PantallaJugadores()
+                            PantallaJugadores(
+                                jugadores = emptyList(),
+                                onJugadorClick = {},
+                                onBackClick = {
+                                    nav.navigate(PrincipalRoute) {
+                                        popUpTo(PrincipalRoute) { inclusive = true }
+                                    }
+                                },
+                                onNuevoJugadorClick = {}
+                            )
                         }
 
                         // 3. LOGIN
@@ -61,7 +73,6 @@ class MainActivity : ComponentActivity() {
                         composable<SignUpRoute>{
                             SignUp(nav)
                         }
-
 
                         // 6. LIGAS
                         composable<LigasRoute> {
@@ -87,6 +98,8 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+
+
 
                     }
                 }
