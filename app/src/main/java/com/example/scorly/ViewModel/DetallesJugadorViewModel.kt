@@ -9,27 +9,30 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class JugadoresViewModel(private val api: ApiService) : ViewModel() {
+class DetallesJugadorViewModel(private val api: ApiService) : ViewModel() {
 
-    private val _jugadores = MutableStateFlow<List<Jugador>>(emptyList())
-    val jugadores = _jugadores.asStateFlow()
+    private val _jugador = MutableStateFlow<Jugador?>(null)
+    val jugador = _jugador.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
-
-    fun cargarJugadores() {
+    fun obtenerDetallesJugador(id: Int) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val response = api.getJugadores()
+                val response = api.getJugadorById(id)
+
                 if (response.isSuccessful) {
-                    _jugadores.value = response.body()?.data ?: emptyList()
+                    val respuestaCruda = response.body()
+                    val jugadorReal = respuestaCruda?.data ?: respuestaCruda
+                    _jugador.value = jugadorReal
+                    println("DEBUG: Nombre recuperado: ${jugadorReal?.nombre}")
                 } else {
                     println("Error API: ${response.code()}")
                 }
             } catch (e: Exception) {
-                println("Error conexión: ${e.message}")
+                println("Error: ${e.message}")
             } finally {
                 _isLoading.value = false
             }
@@ -37,11 +40,11 @@ class JugadoresViewModel(private val api: ApiService) : ViewModel() {
     }
 }
 
-class JugadoresViewModelFactory(private val api: ApiService) : ViewModelProvider.Factory {
+class DetallesJugadorViewModelFactory(private val api: ApiService) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(JugadoresViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(DetallesJugadorViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return JugadoresViewModel(api) as T
+            return DetallesJugadorViewModel(api) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

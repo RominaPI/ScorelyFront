@@ -25,3 +25,6 @@ object PrincipalRoute
 
 @Serializable
 object SignUpRoute
+
+@Serializable
+data class DetalleJugadorRoute(val id: Int)

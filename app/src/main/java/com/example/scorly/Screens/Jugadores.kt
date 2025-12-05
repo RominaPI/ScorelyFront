@@ -18,26 +18,42 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.scorly.Data.ApiServiceFactory
 import com.example.scorly.Models.Jugador
 import com.example.scorly.R
+import com.example.scorly.ViewModel.JugadoresViewModel
+import com.example.scorly.ViewModel.JugadoresViewModelFactory
 
 @Composable
 fun PantallaJugadores(
-    jugadores: List<Jugador> = emptyList(),
-    onJugadorClick: (Int) -> Unit = {},
-    onBackClick: () -> Unit = {},
-    onNuevoJugadorClick: () -> Unit = {}
+    onJugadorClick: (Int) -> Unit,
+    onBackClick: () -> Unit,
+    onNuevoJugadorClick: () -> Unit
 ) {
+    val api = ApiServiceFactory.create()
+    val viewModel: JugadoresViewModel = viewModel(
+        factory = JugadoresViewModelFactory(api)
+    )
+
+    LaunchedEffect(Unit) {
+        viewModel.cargarJugadores()
+    }
+
+    val jugadores by viewModel.jugadores.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+
     val posiciones = listOf("PORTERO", "DEFENSA", "MEDIO", "DELANTERO")
     var filtroActual by remember { mutableStateOf("DELANTERO") }
 
-    // Lógica de filtrado segura (Anti-Crash)
     val jugadoresFiltrados = jugadores.filter { jugador ->
         val posApi = jugador.posicion?.uppercase() ?: ""
         val categoria = when {
@@ -90,18 +106,24 @@ fun PantallaJugadores(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(bottom = 80.dp, top = 16.dp, start = 16.dp, end = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(jugadoresFiltrados) { jugador ->
-                    JugadorCardWithUrl(
-                        jugador = jugador,
-                        onClick = { onJugadorClick(jugador.jugador_id) }
-                    )
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = Color.White)
+                }
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(bottom = 80.dp, top = 16.dp, start = 16.dp, end = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(jugadoresFiltrados) { jugador ->
+                        JugadorCardWithUrl(
+                            jugador = jugador,
+                            onClick = { onJugadorClick(jugador.jugador_id ?: 0)}
+                        )
+                    }
                 }
             }
         }
@@ -131,13 +153,18 @@ fun JugadorCardWithUrl(jugador: Jugador, onClick: () -> Unit) {
         Column(modifier = Modifier.fillMaxSize()) {
             Row(modifier = Modifier.weight(1f).fillMaxWidth().padding(top = 12.dp, start = 12.dp, end = 0.dp)) {
                 Column(modifier = Modifier.weight(0.45f).padding(top = 10.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    Text(text = jugador.nombre.uppercase(), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black, maxLines = 1, textAlign = TextAlign.Center)
-                    Text(text = jugador.apellido.uppercase(), fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black, maxLines = 1)
+                    // AQUÍ ESTABAN LOS ERRORES: Agregué ?. y ?: "" para proteger de nulos
+                    Text(text = jugador.nombre?.uppercase() ?: "", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Black, maxLines = 1, textAlign = TextAlign.Center)
+                    Text(text = jugador.apellido?.uppercase() ?: "", fontSize = 15.sp, fontWeight = FontWeight.ExtraBold, color = Color.Black, maxLines = 1)
+
                     Text(text = "${jugador.numero_camiseta ?: "-"}", fontSize = 40.sp, fontWeight = FontWeight.Black, color = Color.Black, lineHeight = 36.sp, modifier = Modifier.padding(top = 10.dp))
                 }
                 Box(modifier = Modifier.weight(0.50f).fillMaxHeight(), contentAlignment = Alignment.BottomEnd) {
                     AsyncImage(
-                        model = jugador.foto_url,
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(jugador.foto_url)
+                            .crossfade(true)
+                            .build(),
                         contentDescription = "Foto Jugador",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
@@ -156,7 +183,10 @@ fun JugadorCardWithUrl(jugador: Jugador, onClick: () -> Unit) {
                         maxLines = 1
                     )
                     AsyncImage(
-                        model = jugador.escudo_equipo,
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(jugador.escudo_equipo)
+                            .crossfade(true)
+                            .build(),
                         contentDescription = "Escudo",
                         modifier = Modifier.size(32.dp),
                         contentScale = ContentScale.Fit

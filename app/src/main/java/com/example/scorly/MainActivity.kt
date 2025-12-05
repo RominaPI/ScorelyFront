@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -21,9 +23,13 @@ import com.example.scorly.Screens.PaginaPrincipal
 import com.example.scorly.Screens.PantallaJugadores
 import com.example.scorly.Screens.SignUp
 import com.example.scorly.Screens.HomeScreen
+import com.example.scorly.Screens.PantallaDetallesJugador
 import com.example.scorly.Screens.PantallaEquipos
 import com.example.scorly.Screens.PantallaSeleccionLiga
+import com.example.scorly.ViewModel.DetallesJugadorViewModel
 import com.example.scorly.ui.theme.ScorlyTheme
+import androidx.compose.runtime.getValue
+import androidx.navigation.navArgs
 
 
 class MainActivity : ComponentActivity() {
@@ -48,14 +54,15 @@ class MainActivity : ComponentActivity() {
                         // 2. JUGADORES
                         composable<JugadoresRoute>{
                             PantallaJugadores(
-                                jugadores = emptyList(),
-                                onJugadorClick = {},
-                                onBackClick = {
-                                    nav.navigate(PrincipalRoute) {
-                                        popUpTo(PrincipalRoute) { inclusive = true }
-                                    }
+                                // Ya no pasamos 'jugadores', ella los busca sola
+                                onJugadorClick = { id ->
+                                    nav.navigate(DetalleJugadorRoute(id))
                                 },
-                                onNuevoJugadorClick = {}
+                                onBackClick = {
+                                    nav.navigate(PrincipalRoute) { popUpTo(PrincipalRoute) { inclusive = true } }
+                                },
+                                onNuevoJugadorClick = {
+                                }
                             )
                         }
 
@@ -98,6 +105,24 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
+                        // 8. Detalle Jugador
+                        composable<DetalleJugadorRoute> { backStackEntry ->
+                            val args = backStackEntry.toRoute<DetalleJugadorRoute>()
+//
+//                            val api = remember { ApiServiceFactory.create() }
+//                            val viewModel = remember { DetallesJugadorViewModel(api) }
+//                            val jugadorState by viewModel.jugador.collectAsState()
+//
+//                            LaunchedEffect (args.id) {
+//                                viewModel.obtenerDetallesJugador(args.id)
+//                            }
+
+                            PantallaDetallesJugador (
+                                jugadorId = args.id,
+                                onBackClick = { nav.popBackStack() }
+                            )
+                        }
+
 
 
 
