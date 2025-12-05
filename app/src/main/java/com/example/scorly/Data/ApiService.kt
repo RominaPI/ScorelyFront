@@ -2,6 +2,7 @@ package com.example.scorly.Data
 
 import com.example.scorly.Models.Equipo
 import com.example.scorly.Models.EquiposResponse
+import com.example.scorly.Models.EstadisticaResponse
 import com.example.scorly.Models.Jugador
 import com.example.scorly.Models.JugadoresResponse
 import com.example.scorly.Models.LigasResponse
@@ -57,6 +58,10 @@ interface ApiService {
     // ----------- LIGAS -----------
     @GET("ligas")
     suspend fun getLigas(): Response<LigasResponse>
+
+    // ----------- ESTADISTICAS -----------
+    @GET("Jugadores/{id}/estadisticas")
+    suspend fun getEstadisticasJugador(@Path("id") id: Int): Response<EstadisticaResponse>
 }
 
 object ApiServiceFactory {
