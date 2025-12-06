@@ -56,9 +56,7 @@ class MainActivity : ComponentActivity() {
                                 onBackClick = {
                                     nav.navigate(PrincipalRoute) { popUpTo(PrincipalRoute) { inclusive = true } }
                                 },
-                                onNuevoJugadorClick = {
-                                    // nav.navigate(RegistroJugadoresRoute)
-                                }
+
                             )
                         }
 
@@ -133,7 +131,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        // 10. PANTALLA DE ESTADÍSTICAS REAL
+                        // 10. PANTALLA DE ESTADÍSTICAS
                         composable<EstadisticasDetalleRoute> { backStackEntry ->
                             val args = backStackEntry.toRoute<EstadisticasDetalleRoute>()
 

@@ -1,5 +1,6 @@
 package com.example.scorly.Screens
 
+import android.widget.Toast
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -26,26 +28,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.scorly.Data.ApiServiceFactory
 import com.example.scorly.Navigation.PrincipalRoute
 import com.example.scorly.Navigation.SignUpRoute
 import com.example.scorly.R
+import com.example.scorly.ViewModel.AuthStatus
+import com.example.scorly.ViewModel.AuthViewModel
 import com.example.scorly.ui.theme.ScorlyTheme
 import com.example.scorly.ui.theme.contraseña
-import com.example.scorly.Data.RetrofitClient
-import com.example.scorly.Models.LoginRequest
-import kotlinx.coroutines.launch
 
 @Composable
 fun Login(navController: NavController) {
 
+
+    val apiService = remember { ApiServiceFactory.create() }
+    val viewModel: AuthViewModel = remember { AuthViewModel(apiService) } // Usamos el VM
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val context = LocalContext.current
 
-    val scope = rememberCoroutineScope()
+    val authState by viewModel.authState.collectAsState()
+
 
     // ANIMACIÓN del logo cuando está cargando
     val infiniteTransition = rememberInfiniteTransition()
@@ -65,6 +72,32 @@ fun Login(navController: NavController) {
             repeatMode = RepeatMode.Reverse
         )
     )
+
+    // Lógica para realizar el login
+    val performLogin: () -> Unit = {
+        if (email.isNotBlank() && password.isNotBlank() && authState != AuthStatus.Loading) {
+            viewModel.loginUser(email.trim(), password.trim())
+        } else if (authState != AuthStatus.Loading) {
+            viewModel.resetState()
+        }
+    }
+
+
+    LaunchedEffect(authState) {
+        when (val state = authState) {
+            is AuthStatus.Success -> {
+                navController.navigate(PrincipalRoute) {
+                    popUpTo(PrincipalRoute) { inclusive = true }
+                }
+            }
+            is AuthStatus.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                viewModel.resetState()
+            }
+            else -> {}
+        }
+    }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -155,38 +188,11 @@ fun Login(navController: NavController) {
             Box(
                 modifier = Modifier
                     .padding(start = 148.dp, top = 104.dp)
-                    .clickable(enabled = !isLoading) {
-                        if (email.isNotBlank() && password.isNotBlank()) {
-                            scope.launch {
-                                isLoading = true
-                                errorMessage = null
-                                try {
-                                    val response = RetrofitClient.instance.login(
-                                        LoginRequest(email, password)
-                                    )
-                                    if (response.isSuccessful) {
-                                        val body = response.body()
-                                        if (body != null && body.mensaje == "Login exitoso") {
-
-                                            navController.navigate(PrincipalRoute)
-                                        } else {
-                                            errorMessage = body?.mensaje ?: "Credenciales incorrectas"
-                                        }
-                                    } else {
-                                        errorMessage = "Error: ${response.code()}"
-                                    }
-                                } catch (e: Exception) {
-                                    errorMessage = "Error de conexión: ${e.localizedMessage}"
-                                } finally {
-                                    isLoading = false
-                                }
-                            }
-                        } else {
-                            errorMessage = "Por favor completa los campos"
-                        }
+                    .clickable(enabled = authState != AuthStatus.Loading) {
+                        performLogin() // Llama a la lógica del VM
                     }
             ) {
-                if (isLoading) {
+                if (authState is AuthStatus.Loading) {
                     Image(
                         painter = painterResource(id = R.drawable.scorelylogo2),
                         contentDescription = "Cargando",
@@ -196,11 +202,7 @@ fun Login(navController: NavController) {
                             .rotate(rotation)
                             .align(Alignment.Center),
                     )
-                    Box(
-                        modifier = Modifier
-                            .matchParentSize()
-
-                    )
+                    Box(modifier = Modifier.matchParentSize())
                 } else {
                     Text(
                         text = "ENTRAR",
@@ -212,10 +214,10 @@ fun Login(navController: NavController) {
                 }
             }
 
-            // MENSAJE DE ERROR
-            errorMessage?.let {
+
+            (authState as? AuthStatus.Error)?.let {
                 Text(
-                    text = it,
+                    text = it.message,
                     color = Color.Red,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center,
@@ -243,7 +245,7 @@ fun Login(navController: NavController) {
 
             Spacer(Modifier.weight(1f))
 
-            // Marca
+
             Text(
                 text = "SCORELY",
                 fontWeight = FontWeight.Bold,

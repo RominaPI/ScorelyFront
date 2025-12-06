@@ -31,37 +31,64 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.scorly.Data.ApiService
-import com.example.scorly.Models.RegistroRequest
-import com.example.scorly.Models.RegistroResponse
+import com.example.scorly.Data.ApiServiceFactory
 import com.example.scorly.Navigation.PrincipalRoute
 import com.example.scorly.R
+import com.example.scorly.ViewModel.AuthStatus
+import com.example.scorly.ViewModel.AuthViewModel
 import com.example.scorly.ui.theme.ScorlyTheme
 import com.example.scorly.ui.theme.blanco
 import com.example.scorly.ui.theme.contraseña
 import com.example.scorly.ui.theme.negro
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 @Composable
 fun SignUp(navController: NavController) {
+
+    val apiService = remember { ApiServiceFactory.create() }
+    val viewModel: AuthViewModel = remember { AuthViewModel(apiService) }
+
     var usuario by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     val context = LocalContext.current
+    val authState by viewModel.authState.collectAsState()
+
+    // --- LÓGICA DE REGISTRO ---
+    val performRegistration: () -> Unit = {
+        val usuarioClean = usuario.trim()
+        val emailClean = email.trim()
+        val passwordClean = password.trim()
+
+        if (usuarioClean.isBlank() || emailClean.isBlank() || passwordClean.isBlank()) {
+            Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
+        } else if (authState != AuthStatus.Loading) {
+            viewModel.registerUser(usuarioClean, emailClean, passwordClean)
+        }
+    }
 
 
-    val api: ApiService = Retrofit.Builder()
-        .baseUrl("http://165.227.57.191:3000/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-        .create(ApiService::class.java)
+    LaunchedEffect(authState) {
+        when (val state = authState) {
+            is AuthStatus.Success -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                viewModel.resetState()
+            }
+            is AuthStatus.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                viewModel.resetState()
+            }
+            AuthStatus.Finished -> {
+                navController.navigate(PrincipalRoute) {
+                    popUpTo(PrincipalRoute) { inclusive = true }
+                }
+            }
+            else -> {}
+        }
+    }
+
 
     Box(
         modifier = Modifier
@@ -128,9 +155,8 @@ fun SignUp(navController: NavController) {
                     .padding(top = 10.dp)
                     .align(Alignment.CenterHorizontally)
                     .border(1.dp, blanco, RoundedCornerShape(28.dp))
-                    .clip(RoundedCornerShape(28.dp)), keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Next
-                    )
+                    .clip(RoundedCornerShape(28.dp)),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
             TextField(
@@ -168,63 +194,12 @@ fun SignUp(navController: NavController) {
                 , keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Send,
                     keyboardType = KeyboardType.Password),
-                keyboardActions = KeyboardActions(
-                    onSend={
-                        val usuarioClean = usuario.trim()
-                        val emailClean = email.trim()
-                        val passwordClean = password.trim()
-
-                        if (usuarioClean.isBlank() || emailClean.isBlank() || passwordClean.isBlank()) {
-                            Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
-                        } else {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                try {
-                                    val response: Response<RegistroResponse> = api.register(
-                                        RegistroRequest(
-                                            nombre = usuarioClean,
-                                            email = emailClean,
-                                            password = passwordClean
-                                        )
-                                    )
-
-                                    if (response.isSuccessful) {
-                                        val body = response.body()
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            Toast.makeText(
-                                                context,
-                                                body?.mensaje ?: "Registro exitoso",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            navController.navigate(PrincipalRoute)
-                                        }
-                                    } else {
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            Toast.makeText(
-                                                context,
-                                                "Error ${response.code()}",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    }
-                                } catch (e: Exception) {
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        Toast.makeText(
-                                            context,
-                                            "Error: ${e.message}",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-                )
+                keyboardActions = KeyboardActions(onSend = { performRegistration() })
             )
 
             // Botón ENTRAR
             Text(
-                text = "ENTRAR",
+                text = if (authState is AuthStatus.Loading) "CARGANDO..." else "ENTRAR",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 28.sp,
                 color = blanco.copy(alpha = 0.9f),
@@ -234,54 +209,8 @@ fun SignUp(navController: NavController) {
                     .border(1.dp, blanco.copy(alpha = 0.9f), RoundedCornerShape(28.dp))
                     .background(contraseña.copy(alpha = 0.4f), RoundedCornerShape(28.dp))
                     .padding(horizontal = 40.dp, vertical = 10.dp)
-                    .clickable {
-                        val usuarioClean = usuario.trim()
-                        val emailClean = email.trim()
-                        val passwordClean = password.trim()
-
-                        if (usuarioClean.isBlank() || emailClean.isBlank() || passwordClean.isBlank()) {
-                            Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_SHORT).show()
-                        } else {
-                            CoroutineScope(Dispatchers.IO).launch {
-                                try {
-                                    val response: Response<RegistroResponse> = api.register(
-                                        RegistroRequest(
-                                            nombre = usuarioClean,
-                                            email = emailClean,
-                                            password = passwordClean
-                                        )
-                                    )
-
-                                    if (response.isSuccessful) {
-                                        val body = response.body()
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            Toast.makeText(
-                                                context,
-                                                body?.mensaje ?: "Registro exitoso",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                            navController.navigate(PrincipalRoute)
-                                        }
-                                    } else {
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            Toast.makeText(
-                                                context,
-                                                "Error ${response.code()}",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    }
-                                } catch (e: Exception) {
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        Toast.makeText(
-                                            context,
-                                            "Error: ${e.message}",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                }
-                            }
-                        }
+                    .clickable(enabled = authState != AuthStatus.Loading) {
+                        performRegistration() // Llama a la lógica del ViewModel
                     },
                 textAlign = TextAlign.Center
             )

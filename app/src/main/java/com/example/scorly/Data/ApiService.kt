@@ -9,14 +9,19 @@ import retrofit2.http.*
 const val BASE_URL = "http://165.227.57.191:3000/api/"
 
 interface ApiService {
+
     @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
     @POST("auth/register")
     suspend fun register(@Body request: RegistroRequest): Response<RegistroResponse>
 
+    // --- JUGADORES ---
     @GET("jugadores")
     suspend fun getJugadores(): Response<JugadoresResponse>
+
+    @GET("jugadores/equipo/{equipoId}")
+    suspend fun getJugadoresPorEquipo(@Path("equipoId") equipoId: Int): Response<JugadoresResponse>
 
     @GET("jugadores/{id}")
     suspend fun getJugadorById(@Path("id") id: Int): Response<Jugador>
@@ -30,8 +35,12 @@ interface ApiService {
     @DELETE("jugadores/{id}")
     suspend fun deleteJugador(@Path("id") id: Int): Response<Unit>
 
+    // --- EQUIPOS/LIGAS/ESTADISTICAS ---
     @GET("equipos")
     suspend fun getEquipos(): Response<EquiposResponse>
+
+    @GET("equipos/{id}")
+    suspend fun getEquipoById(@Path("id") id: Int): Response<Equipo>
 
     @GET("equipos/liga/{id}")
     suspend fun getEquiposPorLiga(@Path("id") id: Int): Response<EquiposResponse>
