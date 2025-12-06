@@ -174,16 +174,6 @@ fun Login(navController: NavController) {
                     .align(Alignment.CenterHorizontally)
             )
 
-            Text(
-                text = "Reestablecer contraseña",
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 15.sp,
-                color = Color.White,
-                modifier = Modifier
-                    .padding(start = 100.dp, top = 20.dp)
-                    .clickable {  }
-            )
-
             // BOTÓN / ANIMACIÓN DE CARGA
             Box(
                 modifier = Modifier

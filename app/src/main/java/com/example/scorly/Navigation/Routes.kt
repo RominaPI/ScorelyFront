@@ -33,12 +33,6 @@ object RegistroJugadoresRoute
 data class DetallesJugadorRoute(val id: Int)
 
 @Serializable
-object HistorialRoute
-
-@Serializable
-object RankingsRoute
-
-@Serializable
 object SeleccionLigaParaEstadisticasRoute
 
 @Serializable

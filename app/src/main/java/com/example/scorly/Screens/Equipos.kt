@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Search
@@ -27,7 +26,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -57,6 +55,8 @@ fun PantallaEquipos(
     ligaId: String,
     onBackClick: () -> Unit,
     onSiguienteClick: () -> Unit = {},
+    // Nota: Aunque borramos el botón, mantengo el parámetro por si lo usas en la navegación
+    // para no romper la llamada en tu MainActivity/NavGraph.
     onNuevoEquipoClick: () -> Unit = {}
 ) {
     val api = ApiServiceFactory.create()
@@ -111,16 +111,8 @@ fun PantallaEquipos(
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
                 )
             },
-            containerColor = Color.Transparent,
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = onNuevoEquipoClick,
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Nuevo Equipo")
-                }
-            }
+            containerColor = Color.Transparent
+            // El floatingActionButton ha sido eliminado de aquí
         ) { padding ->
 
             Column(

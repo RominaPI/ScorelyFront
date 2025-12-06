@@ -9,7 +9,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -19,13 +18,10 @@ import androidx.navigation.toRoute
 import com.example.scorly.Data.ApiServiceFactory
 import com.example.scorly.Navigation.*
 import com.example.scorly.Screens.*
-// Importamos los ViewModels necesarios
-import com.example.scorly.ViewModel.DetallesJugadorViewModel
 import com.example.scorly.ViewModel.EstadisticasViewModel
 import com.example.scorly.ViewModels.LigasViewModel
 import com.example.scorly.ui.theme.ScorlyTheme
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.viewmodel.compose.viewModel // Importante para el ViewModel de Ligas
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,7 +53,7 @@ class MainActivity : ComponentActivity() {
                                     nav.navigate(PrincipalRoute) { popUpTo(PrincipalRoute) { inclusive = true } }
                                 },
 
-                            )
+                                )
                         }
 
                         // 3. LOGIN

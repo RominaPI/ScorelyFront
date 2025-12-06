@@ -29,10 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.scorly.Navigation.SeleccionLigaParaEstadisticasRoute
-import com.example.scorly.Navigation.HistorialRoute
 import com.example.scorly.Navigation.JugadoresRoute
 import com.example.scorly.Navigation.LigasRoute
-import com.example.scorly.Navigation.RankingsRoute
 import com.example.scorly.R
 import com.example.scorly.ui.theme.amarillo
 import com.example.scorly.ui.theme.blanco
@@ -84,34 +82,24 @@ fun PaginaPrincipal(navController: NavController) {
                 )
             }
 
+            // 1. JUGADORES (ROSTER GLOBAL)
             item {
                 AnimatedButton("Jugadores", R.drawable.jugadores, imagen = R.drawable.jugadoresbanner) {
                     navController.navigate(JugadoresRoute)
                 }
             }
 
+            // 2. EQUIPOS (SELECCIÓN DE LIGA)
             item {
                 AnimatedButton("Equipos", R.drawable.equipos, imagen = R.drawable.equiposbanner) {
                     navController.navigate(LigasRoute)
                 }
             }
 
+            // 3. ESTADÍSTICAS (SELECCIÓN DE LIGA PARA RANKINGS)
             item {
-                // Ahora navegamos a la selección de liga, no directo a estadísticas
                 AnimatedButton("Estadísticas", R.drawable.estadisticas, imagen = R.drawable.estadisticasbanner) {
                     navController.navigate(SeleccionLigaParaEstadisticasRoute)
-                }
-            }
-
-            item {
-                AnimatedButton("Rankings", R.drawable.rankings, imagen = R.drawable.rankingsbanner) {
-                    navController.navigate(RankingsRoute)
-                }
-            }
-
-            item {
-                AnimatedButton("Historial", R.drawable.historial, imagen = R.drawable.historialbanner) {
-                    navController.navigate(HistorialRoute)
                 }
             }
         }
