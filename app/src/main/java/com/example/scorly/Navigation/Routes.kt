@@ -6,19 +6,7 @@ import kotlinx.serialization.Serializable
 object HomeScreenRoute
 
 @Serializable
-object PruebaRoute
-
-@Serializable
 object LoginRoute
-
-@Serializable
-object JugadoresRoute
-
-@Serializable
-object LigasRoute
-
-@Serializable
-data class EquiposRoute(val id: String)
 
 @Serializable
 object PrincipalRoute
@@ -27,4 +15,31 @@ object PrincipalRoute
 object SignUpRoute
 
 @Serializable
-data class DetalleJugadorRoute(val id: Int)
+object LigasRoute
+
+@Serializable
+data class EquiposRoute(val id: Int)
+
+@Serializable
+object RegistroEquiposRoute
+
+@Serializable
+object JugadoresRoute
+
+@Serializable
+object RegistroJugadoresRoute
+
+@Serializable
+data class DetallesJugadorRoute(val id: Int)
+
+@Serializable
+object HistorialRoute
+
+@Serializable
+object RankingsRoute
+
+@Serializable
+object SeleccionLigaParaEstadisticasRoute
+
+@Serializable
+data class EstadisticasDetalleRoute(val id: Int)

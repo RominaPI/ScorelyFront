@@ -18,19 +18,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.scorly.Data.ApiServiceFactory
 import com.example.scorly.Navigation.*
-import com.example.scorly.Screens.Login
-import com.example.scorly.Screens.PaginaPrincipal
-import com.example.scorly.Screens.PantallaJugadores
-import com.example.scorly.Screens.SignUp
-import com.example.scorly.Screens.HomeScreen
-import com.example.scorly.Screens.PantallaDetallesJugador
-import com.example.scorly.Screens.PantallaEquipos
-import com.example.scorly.Screens.PantallaSeleccionLiga
+import com.example.scorly.Screens.*
+// Importamos los ViewModels necesarios
 import com.example.scorly.ViewModel.DetallesJugadorViewModel
+import com.example.scorly.ViewModel.EstadisticasViewModel
+import com.example.scorly.ViewModels.LigasViewModel
 import com.example.scorly.ui.theme.ScorlyTheme
 import androidx.compose.runtime.getValue
-import androidx.navigation.navArgs
-
+import androidx.lifecycle.viewmodel.compose.viewModel // Importante para el ViewModel de Ligas
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +38,8 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = nav,
-                        startDestination = HomeScreenRoute
+                        startDestination = HomeScreenRoute,
+                        modifier = Modifier.fillMaxSize()
                     ) {
 
                         // 1. HOME
@@ -54,14 +50,14 @@ class MainActivity : ComponentActivity() {
                         // 2. JUGADORES
                         composable<JugadoresRoute>{
                             PantallaJugadores(
-                                // Ya no pasamos 'jugadores', ella los busca sola
                                 onJugadorClick = { id ->
-                                    nav.navigate(DetalleJugadorRoute(id))
+                                    nav.navigate(DetallesJugadorRoute(id))
                                 },
                                 onBackClick = {
                                     nav.navigate(PrincipalRoute) { popUpTo(PrincipalRoute) { inclusive = true } }
                                 },
                                 onNuevoJugadorClick = {
+                                    // nav.navigate(RegistroJugadoresRoute)
                                 }
                             )
                         }
@@ -83,9 +79,13 @@ class MainActivity : ComponentActivity() {
 
                         // 6. LIGAS
                         composable<LigasRoute> {
+                            val ligasViewModel: LigasViewModel = viewModel()
+
                             PantallaSeleccionLiga(
-                                onLigaClick = { idLiga ->
-                                    nav.navigate(EquiposRoute(id = idLiga))
+                                viewModel = ligasViewModel,
+                                onLigaClick = { idString ->
+                                    val idInt = idString.toIntOrNull() ?: 1
+                                    nav.navigate(EquiposRoute(id = idInt))
                                 }
                             )
                         }
@@ -93,7 +93,7 @@ class MainActivity : ComponentActivity() {
                         // 7. EQUIPOS
                         composable<EquiposRoute> { backStackEntry ->
                             val args = backStackEntry.toRoute<EquiposRoute>()
-                            val idDeLaLiga = args.id
+                            val idDeLaLiga = args.id.toString()
 
                             PantallaEquipos(
                                 ligaId = idDeLaLiga,
@@ -102,29 +102,53 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onSiguienteClick = {
                                     nav.navigate(JugadoresRoute)
+                                },
+                                onNuevoEquipoClick = {
+                                    nav.navigate(RegistroEquiposRoute)
                                 }
                             )
                         }
-                        // 8. Detalle Jugador
-                        composable<DetalleJugadorRoute> { backStackEntry ->
-                            val args = backStackEntry.toRoute<DetalleJugadorRoute>()
-//
-//                            val api = remember { ApiServiceFactory.create() }
-//                            val viewModel = remember { DetallesJugadorViewModel(api) }
-//                            val jugadorState by viewModel.jugador.collectAsState()
-//
-//                            LaunchedEffect (args.id) {
-//                                viewModel.obtenerDetallesJugador(args.id)
-//                            }
+
+                        // 8. DETALLE JUGADOR
+                        composable<DetallesJugadorRoute> { backStackEntry ->
+                            val args = backStackEntry.toRoute<DetallesJugadorRoute>()
 
                             PantallaDetallesJugador (
                                 jugadorId = args.id,
-                                onBackClick = { nav.popBackStack() }
+                                onBackClick = { nav.popBackStack() },
                             )
                         }
 
 
+                        // 9. SELECCIÓN DE LIGA (PARA ESTADÍSTICAS)
+                        composable<SeleccionLigaParaEstadisticasRoute> {
+                            val ligasViewModel: LigasViewModel = viewModel()
 
+                            PantallaSeleccionLiga(
+                                viewModel = ligasViewModel,
+                                onLigaClick = { idString ->
+                                    val idInt = idString.toIntOrNull() ?: 1
+                                    nav.navigate(EstadisticasDetalleRoute(id = idInt))
+                                }
+                            )
+                        }
+
+                        // 10. PANTALLA DE ESTADÍSTICAS REAL
+                        composable<EstadisticasDetalleRoute> { backStackEntry ->
+                            val args = backStackEntry.toRoute<EstadisticasDetalleRoute>()
+
+                            val apiService = remember { ApiServiceFactory.create() }
+                            val statsViewModel = remember { EstadisticasViewModel(apiService) }
+
+                            LaunchedEffect(args.id) {
+                                statsViewModel.cargarDatos(ligaId = args.id, temporada = "2025-2026")
+                            }
+
+                            EstadisticasScreen(
+                                viewModel = statsViewModel,
+                                onBack = { nav.popBackStack() }
+                            )
+                        }
 
                     }
                 }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Search
@@ -19,12 +20,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -53,7 +56,8 @@ fun getCustomImageLoader(context: Context): ImageLoader {
 fun PantallaEquipos(
     ligaId: String,
     onBackClick: () -> Unit,
-    onSiguienteClick: () -> Unit = {}
+    onSiguienteClick: () -> Unit = {},
+    onNuevoEquipoClick: () -> Unit = {}
 ) {
     val api = ApiServiceFactory.create()
     val viewModel: EquiposViewModel = viewModel(
@@ -107,7 +111,16 @@ fun PantallaEquipos(
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
                 )
             },
-            containerColor = Color.Transparent
+            containerColor = Color.Transparent,
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = onNuevoEquipoClick,
+                    containerColor = Color.White,
+                    contentColor = Color.Black
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Nuevo Equipo")
+                }
+            }
         ) { padding ->
 
             Column(
@@ -148,7 +161,7 @@ fun PantallaEquipos(
                         columns = GridCells.Fixed(3),
                         verticalArrangement = Arrangement.spacedBy(20.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(bottom = 20.dp)
+                        contentPadding = PaddingValues(bottom = 100.dp)
                     ) {
                         items(equiposFiltrados) { equipo ->
                             val isSelected = selectedIds.contains(equipo.equipo_id)
@@ -178,9 +191,7 @@ fun EquipoItem(
     onToggle: () -> Unit
 ) {
     Box(
-        modifier = Modifier
-            .size(100.dp)
-            .clickable { onToggle() },
+        modifier = Modifier.size(100.dp).clickable { onToggle() },
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -206,23 +217,12 @@ fun EquipoItem(
                 contentScale = ContentScale.Fit
             )
         }
-
         if (isSelected) {
             Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .offset(x = (-10).dp, y = 5.dp)
-                    .size(24.dp)
-                    .background(Color(0xFF00C853), CircleShape)
-                    .border(2.dp, Color.White, CircleShape),
+                modifier = Modifier.align(Alignment.TopEnd).offset(x = (-10).dp, y = 5.dp).size(24.dp).background(Color(0xFF00C853), CircleShape).border(2.dp, Color.White, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.Check,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(14.dp)
-                )
+                Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(14.dp))
             }
         }
     }
