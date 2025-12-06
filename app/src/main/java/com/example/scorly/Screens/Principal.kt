@@ -102,6 +102,9 @@ fun PaginaPrincipal(navController: NavController) {
                     navController.navigate(SeleccionLigaParaEstadisticasRoute)
                 }
             }
+
+            // [SE ELIMINARON LOS BOTONES DE RANKINGS E HISTORIAL]
+
         }
     }
 }
