@@ -37,7 +37,6 @@ import com.example.scorly.ViewModel.JugadoresViewModelFactory
 fun PantallaJugadores(
     onJugadorClick: (Int) -> Unit,
     onBackClick: () -> Unit,
-    onNuevoJugadorClick: () -> Unit
 ) {
     val api = ApiServiceFactory.create()
     val viewModel: JugadoresViewModel = viewModel(
@@ -126,18 +125,6 @@ fun PantallaJugadores(
                     }
                 }
             }
-        }
-
-        ExtendedFloatingActionButton(
-            onClick = onNuevoJugadorClick,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 24.dp),
-            containerColor = Color.White,
-            contentColor = Color.Black,
-            elevation = FloatingActionButtonDefaults.elevation(8.dp)
-        ) {
-            Icon(imageVector = Icons.Default.Add, contentDescription = "Agregar")
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "REGISTRAR JUGADOR", fontWeight = FontWeight.Bold)
         }
     }
 }
